@@ -21,6 +21,8 @@ function createSelector(idx: number) {
 	const selector = document.createElement("input");
 	selector.type = "color";
 	selector.id = `select-${idx}`;
+	const col = translate[idx];
+	selector.value = ``
 	selector.addEventListener("change", (e) => console.log(e));
 	section.appendChild(selector);
 }
