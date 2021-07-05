@@ -12,18 +12,39 @@ async function init() {
 	baseLogo.src = "logo.png";
 	await new Promise(res => baseLogo.onload = res);
 	console.log("Image loaded");
-	ctx.drawImage(baseLogo, 0, 0);
 	update();
 	translate.forEach((col, idx) => createSelector(idx));
+	document.getElementById("save").addEventListener("click", () => {
+		var link = document.createElement('a');
+		link.download = `logo.png`;
+		link.href = canvas.toDataURL()
+		link.click();
+	})
 }
 function createSelector(idx: number) {
 	const section = document.getElementById("inputs");
 	const selector = document.createElement("input");
 	selector.type = "color";
 	selector.id = `select-${idx}`;
+	let last = "";
+	setInterval(() => {
+		if (selector.value != last) {
+			const r = selector.value.substring(1, 3);
+			const g = selector.value.substring(3, 5);
+			const b = selector.value.substring(5, 7);
+			translate[idx] = {
+				r: parseInt(r, 16),
+				g: parseInt(g, 16),
+				b: parseInt(b, 16)
+			}
+			last = selector.value;
+			update();
+		}
+	}, 16);
 	const col = translate[idx];
-	selector.value = ``
-	selector.addEventListener("change", (e) => console.log(e));
+	selector.value = '#' + col.r.toString(16) + col.g.toString(16) + col.b.toString(16);
+	// selector.addEventListener("change", (e) => console.log(selector.value));
+
 	section.appendChild(selector);
 }
 interface Pixel {
@@ -61,6 +82,7 @@ function processPix(pixel: Pixel): Pixel {
 }
 const pixs = {};
 function update() {
+	ctx.drawImage(baseLogo, 0, 0);
 	const imageData = ctx.getImageData(0, 0, width, height);
 	const { data } = imageData
 	const newData: number[] = [];
